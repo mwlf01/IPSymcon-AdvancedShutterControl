@@ -1,0 +1,16 @@
+{
+    "id": "{A3B5C7D9-1E2F-4A6B-8C0D-E2F4A6B8C0D2}",
+    "name": "AdvancedShutterControl",
+    "type": 3,
+    "vendor": "",
+    "aliases": [
+        "Advanced Shutter Control",
+        "Roller Shutter Control",
+        "Blind Control"
+    ],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "ASC",
+    "url": "https://github.com/mwlf01/IPSymcon-AdvancedShutterControl"
+}

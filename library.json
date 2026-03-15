@@ -1,0 +1,12 @@
+{
+    "id": "{C7E2A4B8-3F6D-5E9A-B1C4-D8F0E2A6B3C5}",
+    "name": "AdvancedShutterControl",
+    "author": "mwlf01",
+    "url": "https://github.com/mwlf01/IPSymcon-AdvancedShutterControl",
+    "compatibility": {
+        "version": "8.1"
+    },
+    "version": "1.0.0",
+    "build": 0,
+    "date": 0
+}

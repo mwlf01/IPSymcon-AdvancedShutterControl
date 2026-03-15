@@ -1,0 +1,30 @@
+{
+    "translations": {
+        "de": {
+            "Advanced Shutter Control": "Erweiterte Rollladensteuerung",
+            "Roller Shutter Control": "Rollladensteuerung",
+            "Blind Control": "Jalousiesteuerung",
+            "Shutters": "Rollladen",
+            "Roller Shutters / Blinds": "Rollladen / Jalousien",
+            "Shutter Variable": "Rollladen-Variable",
+            "Name": "Name",
+            "Open Position (%)": "Offen-Position (%)",
+            "Closed Position (%)": "Geschlossen-Position (%)",
+            "Target Position": "Sollposition",
+            "Shutter Mode": "Rollladen-Modus",
+            "Open": "Offen",
+            "Closed": "Geschlossen",
+            "Shade": "Beschattung",
+            "Ventilate": "Lüften",
+            "Shade Position": "Beschattungsposition",
+            "Ventilate Position": "Lüftungsposition",
+            "Manual Operation Blocked": "Manuelle Bedienung gesperrt",
+            "Weekly Schedule": "Wochenplan",
+            "The weekly schedule is managed via IP-Symcon's built-in schedule event.": "Der Wochenplan wird über das integrierte Zeitplan-Ereignis von IP-Symcon verwaltet.",
+            "Configure Open, Close, Shade, and Ventilate times in the schedule below the instance.": "Konfigurieren Sie die Offen-, Geschlossen-, Beschattungs- und Lüftungszeiten im Zeitplan unterhalb der Instanz.",
+            "Open Weekly Schedule": "Wochenplan öffnen",
+            "Module is active": "Modul ist aktiv",
+            "No shutters configured": "Keine Rollladen konfiguriert"
+        }
+    }
+}
