@@ -166,25 +166,34 @@ class AdvancedShutterControl extends IPSModule
                                     ]
                                 ],
                                 [
-                                    'caption' => 'Open Position (%)',
+                                    'caption' => 'Open Value',
                                     'name' => 'OpenPosition',
-                                    'width' => '220px',
+                                    'width' => '180px',
+                                    'add' => 0,
+                                    'edit' => [
+                                        'type' => 'NumberSpinner',
+                                        'digits' => 2
+                                    ]
+                                ],
+                                [
+                                    'caption' => 'Close Value',
+                                    'name' => 'ClosePosition',
+                                    'width' => '180px',
+                                    'add' => 100,
+                                    'edit' => [
+                                        'type' => 'NumberSpinner',
+                                        'digits' => 2
+                                    ]
+                                ],
+                                [
+                                    'caption' => 'Decimal Places',
+                                    'name' => 'DecimalPlaces',
+                                    'width' => '160px',
                                     'add' => 0,
                                     'edit' => [
                                         'type' => 'NumberSpinner',
                                         'minimum' => 0,
-                                        'maximum' => 100
-                                    ]
-                                ],
-                                [
-                                    'caption' => 'Closed Position (%)',
-                                    'name' => 'ClosePosition',
-                                    'width' => '220px',
-                                    'add' => 100,
-                                    'edit' => [
-                                        'type' => 'NumberSpinner',
-                                        'minimum' => 0,
-                                        'maximum' => 100
+                                        'maximum' => 6
                                     ]
                                 ]
                             ]
@@ -342,7 +351,7 @@ class AdvancedShutterControl extends IPSModule
                 $shutterID = (int)$shutter['ShutterID'];
                 if ($shutterID > 0 && @IPS_VariableExists($shutterID)) {
                     $actuatorValue = $this->scaleToActuator($targetPct, $shutter);
-                    $this->sendToShutter($shutterID, $actuatorValue);
+                    $this->sendToShutter($shutterID, $actuatorValue, $shutter);
                 }
             }
         } finally {
@@ -498,10 +507,25 @@ class AdvancedShutterControl extends IPSModule
 
         // Convert the raw actuator value to a logical percentage
         $rawValue = isset($data[0]) ? (float)$data[0] : 0.0;
-        $newPct = $this->scaleToPercent($rawValue, $senderShutter);
         $currentPct = (int)@GetValue($this->GetIDForIdent('TargetPosition'));
 
-        // Check if the change was significant (not just our own update)
+        // Compare raw actuator value against what we would send for the current
+        // target percent. This avoids the lossy percent→actuator→percent round-trip
+        // that causes oscillation when shutter ranges differ (e.g. 0-100 vs 0-1).
+        $expectedActuator = $this->scaleToActuator($currentPct, $senderShutter);
+        $varType = IPS_GetVariable($shutterID)['VariableType'];
+        if ($varType === VARIABLETYPE_FLOAT) {
+            $digits = (int)($senderShutter['DecimalPlaces'] ?? 0);
+            $tolerance = $digits > 0 ? (0.5 / pow(10, $digits)) : 0.5;
+        } else {
+            $tolerance = 0.5;
+        }
+        if (abs($rawValue - $expectedActuator) <= $tolerance) {
+            return;
+        }
+
+        $newPct = $this->scaleToPercent($rawValue, $senderShutter);
+        // Additional percent-level guard
         if (abs($newPct - $currentPct) < 1) {
             return;
         }
@@ -509,7 +533,7 @@ class AdvancedShutterControl extends IPSModule
         // Revert to current target if manual operation is blocked
         if ($this->isManualOperationBlocked()) {
             $expectedActuator = $this->scaleToActuator($currentPct, $senderShutter);
-            $this->sendToShutter($shutterID, $expectedActuator);
+            $this->sendToShutter($shutterID, $expectedActuator, $senderShutter);
             return;
         }
 
@@ -530,12 +554,19 @@ class AdvancedShutterControl extends IPSModule
     /**
      * Send an actuator value to a single shutter (no scaling, raw value).
      */
-    private function sendToShutter(int $shutterID, float $actuatorValue): void
+    private function sendToShutter(int $shutterID, float $actuatorValue, array $shutter = []): void
     {
         $current = (float)@GetValue($shutterID);
         $varType = IPS_GetVariable($shutterID)['VariableType'];
-        $targetValue = ($varType === VARIABLETYPE_FLOAT) ? $actuatorValue : (int)round($actuatorValue);
-        if (abs($current - $actuatorValue) > 0.5) {
+        if ($varType === VARIABLETYPE_FLOAT) {
+            $digits = (int)($shutter['DecimalPlaces'] ?? 0);
+            $targetValue = round($actuatorValue, $digits);
+            $threshold = $digits > 0 ? (0.5 / pow(10, $digits)) : 0.5;
+        } else {
+            $targetValue = (int)round($actuatorValue);
+            $threshold = 0.5;
+        }
+        if (abs($current - $targetValue) > $threshold) {
             @RequestAction($shutterID, $targetValue);
         }
     }
@@ -546,9 +577,20 @@ class AdvancedShutterControl extends IPSModule
      */
     private function scaleToActuator(int $percent, array $shutter): float
     {
-        $open  = (int)($shutter['OpenPosition']  ?? 0);
-        $close = (int)($shutter['ClosePosition'] ?? 100);
-        return $open + ($close - $open) * ($percent / 100.0);
+        $open  = (float)($shutter['OpenPosition']  ?? 0);
+        $close = (float)($shutter['ClosePosition'] ?? 100);
+        $value = $open + ($close - $open) * ($percent / 100.0);
+
+        $shutterID = (int)($shutter['ShutterID'] ?? 0);
+        if ($shutterID > 0 && @IPS_VariableExists($shutterID)) {
+            $varType = IPS_GetVariable($shutterID)['VariableType'];
+            if ($varType === VARIABLETYPE_FLOAT) {
+                $digits = (int)($shutter['DecimalPlaces'] ?? 0);
+                return round($value, $digits);
+            }
+            return (float)(int)round($value);
+        }
+        return $value;
     }
 
     /**
@@ -556,9 +598,9 @@ class AdvancedShutterControl extends IPSModule
      */
     private function scaleToPercent(float $actuatorValue, array $shutter): int
     {
-        $open  = (int)($shutter['OpenPosition']  ?? 0);
-        $close = (int)($shutter['ClosePosition'] ?? 100);
-        if ($open === $close) {
+        $open  = (float)($shutter['OpenPosition']  ?? 0);
+        $close = (float)($shutter['ClosePosition'] ?? 100);
+        if (abs($open - $close) < 0.0001) {
             return 0;
         }
         $pct = ($actuatorValue - $open) / ($close - $open) * 100.0;

@@ -6,7 +6,7 @@ An IP-Symcon module for advanced control of roller shutters and blinds. Supports
 
 - **Group Control** – Control multiple roller shutters / blinds as a group with a single master position slider
 - **Operating Modes** – Open, Close, Shade, and Ventilate modes with configurable positions
-- **Per-Shutter Scaling** – Each shutter has its own open/closed position range, allowing mixed actuator types in one group
+- **Per-Shutter Scaling** – Each shutter has its own open/closed value (any range), allowing mixed actuator types in one group
 - **Weekly Schedule** – Automated position changes via IP-Symcon's built-in schedule events (per-day configuration)
 - **Manual Operation Lock** – Optionally block manual changes on the physical shutters
 - **Localized** – English and German translations included
@@ -29,14 +29,15 @@ An IP-Symcon module for advanced control of roller shutters and blinds. Supports
 
 ### Shutters
 
-Add the position variables of your roller shutters / blinds. These must be **Integer** or **Float** variables with a range of 0–100%. Each shutter has its own open and closed position, allowing mixed actuator types in one group.
+Add the position variables of your roller shutters / blinds. These must be **Integer** or **Float** variables. Each shutter has its own open and closed value, allowing mixed actuator types and ranges in one group. The module scales linearly between the open and close values. For Integer variables the result is rounded to whole numbers; for Float variables you can configure the number of decimal places.
 
 | Property | Default | Description |
 |----------|---------|-------------|
 | Shutter Variable | – | The position variable of the shutter actuator |
 | Name | – | Optional display name |
-| Open Position (%) | 0 | Position value for fully open (per shutter) |
-| Closed Position (%) | 100 | Position value for fully closed (per shutter) |
+| Open Value | 0 | Actuator value that means fully open (per shutter) |
+| Close Value | 100 | Actuator value that means fully closed (per shutter) |
+| Decimal Places | 0 | Number of decimal places for Float variables (0–6) |
 
 ### Weekly Schedule
 
@@ -55,10 +56,10 @@ The following variables are created automatically and can be used for visualizat
 
 | Ident | Name | Type | Description |
 |-------|------|------|-------------|
-| TargetPosition | Target Position | Integer | Master position slider (0–100%) |
+| TargetPosition | Target Position | Integer | Master position slider (0 = open, 100 = closed). The module scales this to each shutter's individual value range. |
 | ShutterMode | Shutter Mode | Integer | Current mode: Open (0), Closed (1), Shade (2), Ventilate (3) |
-| ShadePosition | Shade Position | Integer | Position used for shade mode (0–100%) |
-| VentilatePosition | Ventilate Position | Integer | Position used for ventilate mode (0–100%) |
+| ShadePosition | Shade Position | Integer | Logical position used for shade mode (0–100) |
+| VentilatePosition | Ventilate Position | Integer | Logical position used for ventilate mode (0–100) |
 | ManualOperationBlocked | Manual Operation Blocked | Boolean | Block manual changes on physical shutters |
 
 ## Public Functions

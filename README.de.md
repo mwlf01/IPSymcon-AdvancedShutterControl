@@ -6,7 +6,7 @@ Ein IP-Symcon-Modul zur erweiterten Steuerung von Rollladen und Jalousien. Unter
 
 - **Gruppensteuerung** – Steuern Sie mehrere Rollladen / Jalousien als Gruppe mit einem einzigen Master-Positionsregler
 - **Betriebsmodi** – Offen, Geschlossen, Beschattung und Lüften mit konfigurierbaren Positionen
-- **Individuelle Positionsskalierung** – Jeder Rollladen hat seinen eigenen Offen-/Geschlossen-Positionsbereich, sodass verschiedene Aktortypen in einer Gruppe gemischt werden können
+- **Individuelle Werteskalierung** – Jeder Rollladen hat seinen eigenen Offen-/Geschlossen-Wert (beliebiger Bereich), sodass verschiedene Aktortypen in einer Gruppe gemischt werden können
 - **Wochenplan** – Automatische Positionsänderungen über die integrierten Zeitplan-Ereignisse von IP-Symcon (Konfiguration pro Tag)
 - **Manuelle Bediensperre** – Optionale Sperrung manueller Änderungen an den physischen Rollladen
 - **Lokalisiert** – Englische und deutsche Übersetzungen enthalten
@@ -29,14 +29,15 @@ Ein IP-Symcon-Modul zur erweiterten Steuerung von Rollladen und Jalousien. Unter
 
 ### Rollladen
 
-Fügen Sie die Positionsvariablen Ihrer Rollladen / Jalousien hinzu. Dies müssen **Integer**- oder **Float**-Variablen mit einem Bereich von 0–100% sein. Jeder Rollladen hat seine eigene Offen- und Geschlossen-Position, sodass verschiedene Aktortypen in einer Gruppe gemischt werden können.
+Fügen Sie die Positionsvariablen Ihrer Rollladen / Jalousien hinzu. Dies müssen **Integer**- oder **Float**-Variablen sein. Jeder Rollladen hat seinen eigenen Offen- und Geschlossen-Wert, sodass verschiedene Aktortypen und Wertebereiche in einer Gruppe gemischt werden können. Das Modul skaliert linear zwischen den Offen- und Geschlossen-Werten. Bei Integer-Variablen wird auf Ganzzahlen gerundet; bei Float-Variablen kann die Anzahl der Nachkommastellen konfiguriert werden.
 
 | Eigenschaft | Standard | Beschreibung |
 |-------------|---------|-------------|
 | Rollladen-Variable | – | Die Positionsvariable des Rollladenaktors |
 | Name | – | Optionaler Anzeigename |
-| Offen-Position (%) | 0 | Positionswert für vollständig geöffnet (pro Rollladen) |
-| Geschlossen-Position (%) | 100 | Positionswert für vollständig geschlossen (pro Rollladen) |
+| Offen-Wert | 0 | Aktorwert für vollständig geöffnet (pro Rollladen) |
+| Geschlossen-Wert | 100 | Aktorwert für vollständig geschlossen (pro Rollladen) |
+| Nachkommastellen | 0 | Anzahl der Nachkommastellen für Float-Variablen (0–6) |
 
 ### Wochenplan
 
@@ -55,10 +56,10 @@ Die folgenden Variablen werden automatisch erstellt und können zur Visualisieru
 
 | Ident | Name | Typ | Beschreibung |
 |-------|------|-----|-------------|
-| TargetPosition | Sollposition | Integer | Master-Positionsregler (0–100%) |
+| TargetPosition | Sollposition | Integer | Master-Positionsregler (0 = offen, 100 = geschlossen). Das Modul skaliert diesen Wert auf den individuellen Wertebereich jedes Rollladens. |
 | ShutterMode | Rollladen-Modus | Integer | Aktueller Modus: Offen (0), Geschlossen (1), Beschattung (2), Lüften (3) |
-| ShadePosition | Beschattungsposition | Integer | Position für den Beschattungsmodus (0–100%) |
-| VentilatePosition | Lüftungsposition | Integer | Position für den Lüftungsmodus (0–100%) |
+| ShadePosition | Beschattungsposition | Integer | Logische Position für den Beschattungsmodus (0–100) |
+| VentilatePosition | Lüftungsposition | Integer | Logische Position für den Lüftungsmodus (0–100) |
 | ManualOperationBlocked | Manuelle Bedienung gesperrt | Boolean | Manuelle Änderungen an physischen Rollladen sperren |
 
 ## Öffentliche Funktionen
