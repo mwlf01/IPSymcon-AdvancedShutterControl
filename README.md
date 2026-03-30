@@ -99,6 +99,24 @@ int ASC_GetScheduleEventID(int $InstanceID);
 ASC_ScheduleAction(int $InstanceID, int $ActionID);
 ```
 
+## Support
+
+For issues, feature requests, or contributions, please visit:
+- [GitHub Repository](https://github.com/mwlf01/IPSymcon-AdvancedShutterControl)
+- [GitHub Issues](https://github.com/mwlf01/IPSymcon-AdvancedShutterControl/issues)
+- [Symcon Community](https://community.symcon.de/) – User: **mwlf**
+
+---
+
 ## License
 
 MIT License – see [LICENSE](LICENSE) for details.
+
+---
+
+## Author
+
+**mwlf01**
+
+- GitHub: [@mwlf01](https://github.com/mwlf01)
+- Symcon Community: [mwlf](https://community.symcon.de/)
