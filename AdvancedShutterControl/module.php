@@ -487,8 +487,9 @@ class AdvancedShutterControl extends IPSModule
 
     private function handleShutterChange(int $shutterID, array $data): void
     {
-        // Ignore updates triggered by our own ApplyPosition calls
-        if ($this->applyingPosition) {
+        // Ignore updates within the debounce window after ApplyPosition
+        $applyTS = (float)$this->GetBuffer('ApplyTS');
+        if ($applyTS > 0 && ((microtime(true) * 1000) - $applyTS) < self::APPLY_DEBOUNCE_MS) {
             return;
         }
 
